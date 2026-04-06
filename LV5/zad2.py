@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix , ConfusionMatrixDisplay
+from sklearn.metrics import classification_report
 
 labels= {0:'Adelie', 1:'Chinstrap', 2:'Gentoo'}
 
@@ -48,9 +50,7 @@ df = df.drop(columns=['sex'])
 df.dropna(axis=0, inplace=True)
 
 # kategoricka varijabla vrsta - kodiranje
-df['species'].replace({'Adelie' : 0,
-                        'Chinstrap' : 1,
-                        'Gentoo': 2}, inplace = True)
+df['species'] = df['species'].map({'Adelie': 0, 'Chinstrap': 1, 'Gentoo': 2}).astype(int)
 
 print(df.info())
 
@@ -75,12 +75,28 @@ speciesTest, countsTest = np.unique(y_test, return_counts=True)
 plt.bar(speciesTest, countsTest)
 plt.figure()
 plt.bar(speciesTrain, countsTrain)
-plt.show()
 
 # b)
 
 logModel = LogisticRegression()
 logModel.fit(X_train, y_train)
 
+# c)
+
 print(logModel.intercept_)
 print(logModel.coef_)
+
+# d)
+
+plot_decision_regions(X_train, y_train.flatten(), logModel)
+
+# e)
+
+y_test_p = logModel.predict(X_test)
+
+disp = ConfusionMatrixDisplay(confusion_matrix(y_test, y_test_p))
+disp.plot()
+
+print(classification_report(y_test, y_test_p))
+
+plt.show()
